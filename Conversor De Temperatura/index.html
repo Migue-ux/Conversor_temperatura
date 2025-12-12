@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="space">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Conversor Espacial — Among Us Inspired</title>
+  <link rel="stylesheet" href="/Conversao.css">
+  <meta name="color-scheme" content="dark light">
+</head>
+<body>
+  <!-- BACKGROUND: estrelas + nebulosa -->
+  <div class="space-layer" aria-hidden="true"></div>
+
+  <!-- MAIN PANEL (centro) - painel estilo "tarefas" -->
+  <main class="ship-panel" role="main" aria-labelledby="tituloApp">
+    <header class="panel-head">
+      <!-- badge / crewmate simplificado -->
+      <svg class="logo-crewmate" viewBox="0 0 64 64" role="img" aria-hidden="true">
+        <path d="M24 10c10-6 20-2 24 6 3 6 3 14-1 20l7 8c2 2 1 6-3 6h-6l-3-5-3 5H16c-5 0-8-5-6-10l4-8c-4-12 2-18 10-22Z" fill="#c51111"/>
+        <ellipse cx="40" cy="26" rx="10" ry="8" fill="#58d7f0"/>
+      </svg>
+
+      <div class="title-wrap">
+        <h1 id="tituloApp">Conversor Espacial</h1>
+
+      </div>
+    </header>
+
+    <form id="converterForm" class="panel-body" aria-describedby="helpInstructions" novalidate>
+      <div class="field">
+        <label for="valor" class="label">Valor</label>
+        <div class="input-wrap">
+          <input id="valor" name="valor" type="number" inputmode="decimal" placeholder="Ex: 25" aria-required="true" />
+          <!-- ícone termômetro inline -->
+          <svg class="icon icon-thermo" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14 14.76V5a2 2 0 1 0-4 0v9.76A4 4 0 1 0 14 14.76z" fill="currentColor"/>
+          </svg>
+        </div>
+        <div id="err-valor" class="field-msg" aria-live="polite"></div>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label for="de" class="label">Converter de</label>
+          <select id="de" name="de">
+            <option value="C">Celsius (°C)</option>
+            <option value="F">Fahrenheit (°F)</option>
+            <option value="K">Kelvin (K)</option>
+            <option value="X">Personalizada (°X)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="para" class="label">Para</label>
+          <select id="para" name="para">
+            <option value="all">Todas</option>
+            <option value="C">Celsius (°C)</option>
+            <option value="F">Fahrenheit (°F)</option>
+            <option value="K">Kelvin (K)</option>
+            <option value="X">Personalizada (°X)</option>
+          </select>
+        </div>
+      </div>
+
+      <details class="panel-advanced" aria-details="EscalaPersonalizada">
+        <summary>Escala personalizada</summary>
+        <div id="EscalaPersonalizada" class="advanced-grid">
+          <div class="field">
+            <label for="nomeEscala" class="label">Nome</label>
+            <input id="nomeEscala" name="nomeEscala" type="text" placeholder="Ex: X-Terra" />
+          </div>
+          <div class="field">
+            <label for="siglaEscala" class="label">Sigla</label>
+            <input id="siglaEscala" name="siglaEscala" type="text" maxlength="3" placeholder="Ex: X" />
+          </div>
+          <div class="field">
+            <label for="fusao" class="label">Ponto de fusão (°X)</label>
+            <input id="fusao" name="fusao" type="number" placeholder="Ex: 10" />
+          </div>
+          <div class="field">
+            <label for="ebulicao" class="label">Ponto de ebulição (°X)</label>
+            <input id="ebulicao" name="ebulicao" type="number" placeholder="Ex: 110" />
+          </div>
+          <div id="err-x" class="field-msg" aria-live="polite"></div>
+        </div>
+      </details>
+
+      <div class="actions">
+        <!-- botão vermelho estilo Emergency Meeting -->
+        <button id="btnConverter" class="btn-emergency" type="submit" aria-describedby="helpInstructions">
+          <svg class="icon-emergency" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><rect x="7" y="10" width="10" height="4" rx="1"/></svg>
+          Converter
+        </button>
+
+        <button id="btnPanel" type="button" class="btn-ghost" aria-controls="sidepanel" aria-expanded="false">Painel</button>
+
+        <div class="badge"><strong></strong></div>
+      </div>
+
+      <p id="helpInstructions" class="hint"></p>
+    </form>
+  </main>
+
+  <!-- SIDE PANEL (opcional) -->
+  <aside id="sidepanel" class="sidepanel" aria-hidden="true" role="dialog" aria-labelledby="sideTitle">
+    <header class="side-head">
+      <h2 id="sideTitle">Painel de Conversões</h2>
+      <button id="closeSide" class="btn-close" aria-label="Fechar painel">✕</button>
+    </header>
+    <div class="side-body" id="sideBody">
+      <p>Conversões recentes aparecem aqui.</p>
+    </div>
+  </aside>
+
+  <!-- POPUP RESULT (visor/monitor) -->
+  <div id="popup" class="popup" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="popupTitle">
+    <div class="popup-frame" role="document">
+      <header class="popup-head">
+        <svg class="icon-visor" viewBox="0 0 160 56" aria-hidden="true">
+          <rect x="2" y="6" rx="10" width="156" height="44" fill="#071624"/>
+          <rect x="14" y="16" rx="6" width="132" height="24" fill="#0f2540"/>
+        </svg>
+        <h3 id="popupTitle">Resultado</h3>
+      </header>
+
+      <div id="resultado" class="popup-body" tabindex="0" aria-live="polite"></div>
+
+      <footer class="popup-footer">
+        <button id="closePopup" class="btn-ghost" aria-label="Fechar resultado">Fechar (ESC)</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- SVG assets inline (symbols) -->
+  <svg class="visually-hidden" aria-hidden="true" style="position: absolute; width:0; height:0;">
+    <symbol id="sv-crew" viewBox="0 0 64 64">
+      <path d="M24 10c10-6 20-2 24 6 3 6 3 14-1 20l7 8c2 2 1 6-3 6h-6l-3-5-3 5H16c-5 0-8-5-6-10l4-8c-4-12 2-18 10-22Z" fill="#c51111"/>
+      <ellipse cx="40" cy="26" rx="10" ry="8" fill="#58d7f0"/>
+    </symbol>
+    <symbol id="sv-ship" viewBox="0 0 64 64">
+      <path d="M8 36c10-14 26-24 48-26-2 22-12 38-26 48l-8 2-6-6 2-8Z" fill="#2b5ad6"/>
+      <circle cx="44" cy="20" r="6" fill="#2CB2A8"/>
+    </symbol>
+    <symbol id="sv-thermo" viewBox="0 0 24 24">
+      <path d="M14 14.76V5a2 2 0 1 0-4 0v9.76A4 4 0 1 0 14 14.76z" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+   <script src="script.js" defer></script>
+   <script src="Script2.js"></script>
+</body>
+</html>
